@@ -1,0 +1,28 @@
+$:.push File.expand_path("../lib", __FILE__)
+
+# Maintain your gem's version:
+require "clients/version"
+
+# Describe your gem and declare its dependencies:
+Gem::Specification.new do |s|
+  s.name        = "clients"
+  s.version     = Clients::VERSION
+  s.authors     = ["Andrew Volozhanin"]
+  s.email       = ["scarfacedeb@gmail.com"]
+  s.homepage    = ""
+  s.summary     = "Clients to communicate with web and services"
+  s.description = "Clients contains instruments to work with websites and local services. Adapted from manul."
+
+  s.files = Dir["{lib}/**/*", "README.md"]
+  s.test_files = []
+
+  s.add_dependency "connection_pool", "~> 2.2"
+  s.add_dependency "addressable", "~> 2.3"
+  s.add_dependency "http", "~> 2.0"
+  s.add_dependency "net-telnet", "~> 0.1"
+  s.add_dependency "nokogiri", "~> 1.6"
+
+  s.add_development_dependency "rspec", "~> 3.5"
+  s.add_development_dependency "webmock", "~> 2.1"
+  s.add_development_dependency "pry-byebug"
+end

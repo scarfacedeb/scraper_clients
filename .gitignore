@@ -1,0 +1,7 @@
+*.gem
+.bundle
+vendor
+pkg
+Gemfile.lock
+tmp
+bin
