@@ -4,15 +4,21 @@ require "nokogiri"
 module Clients
   class HttpClient
     class Response < SimpleDelegator
+      DEFAULT_ENCODING = Encoding::UTF_8
+
       alias_method :object, :__getobj__
 
       def to_s
         response = object.to_s
 
-        if response.encoding == Encoding::UTF_8
+        if object.charset
           response
+            .encode(DEFAULT_ENCODING)
+            .scrub("_")
         else
-          response.force_encoding Encoding::UTF_8
+          response
+            .force_encoding(DEFAULT_ENCODING)
+            .scrub("_")
         end
       end
 

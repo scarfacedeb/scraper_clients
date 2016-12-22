@@ -20,13 +20,24 @@ module Clients
           expect(subject.to_s).to eq("BODY")
         end
 
-        context "when response is encoded in CP1251 encoding" do
+        context "when response doesn't have valid charset" do
+          let(:body) { "Correct Ответ".force_encoding Encoding::CP1251 }
+
+          it "returns response body in UTF-8 encoding" do
+            response = subject.to_s
+
+            expect(response.encoding).to eq(Encoding::UTF_8)
+            expect(response).to eq("Correct Ответ")
+          end
+        end
+
+        context "when response have valid charset - windows-1251" do
           let(:headers) {
             {
               "Content-Type" => "text/html; charset=windows-1251"
             }
           }
-          let(:body) { "Correct Ответ".force_encoding Encoding::CP1251 }
+          let(:body) { "Correct Ответ".encode Encoding::CP1251 }
 
           it "returns response body in UTF-8 encoding" do
             response = subject.to_s
