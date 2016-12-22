@@ -24,14 +24,10 @@ module Clients
 
       def to_html
         Nokogiri::HTML.parse to_s
-      rescue
-        to_s
       end
 
       def to_json
         JSON.parse to_s, symbolize_names: true
-      rescue
-        to_s
       end
 
       def stream(size = HTTP::Connection::BUFFER_SIZE)
