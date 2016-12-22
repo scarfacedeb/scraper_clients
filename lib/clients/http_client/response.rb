@@ -4,9 +4,17 @@ require "nokogiri"
 module Clients
   class HttpClient
     class Response < SimpleDelegator
+      alias_method :object, :__getobj__
+
       DEFAULT_ENCODING = Encoding::UTF_8
 
-      alias_method :object, :__getobj__
+      def success?
+        object.status.success?
+      end
+
+      def fail?
+        !success?
+      end
 
       def to_s
         response = object.to_s

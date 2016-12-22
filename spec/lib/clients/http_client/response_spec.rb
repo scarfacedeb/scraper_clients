@@ -5,15 +5,48 @@ module Clients
     RSpec.describe Response do
       let(:headers) { {} }
       let(:body) { "BODY" }
+      let(:status) { 200 }
       let(:response) {
         HTTP::Response.new(
-          status: @status || 200,
+          status: status,
           version: "1.1",
           headers: headers,
           body: body
         )
       }
       subject { described_class.new(response) }
+
+      describe "#success?" do
+        context "when response has succeeded" do
+          let(:status) { 200 }
+          it "returns true" do
+            is_expected.to be_success
+          end
+        end
+
+        context "when response has failed" do
+          let(:status) { 502 }
+          it "returns false" do
+            is_expected.not_to be_success
+          end
+        end
+      end
+
+      describe "#fail?" do
+        context "when response has failed" do
+          let(:status) { 400 }
+          it "returns true" do
+            is_expected.to be_fail
+          end
+        end
+
+        context "when response has succeeded" do
+          let(:status) { 201 }
+          it "returns false" do
+            is_expected.not_to be_fail
+          end
+        end
+      end
 
       describe "#to_s" do
         it "returns response body" do
