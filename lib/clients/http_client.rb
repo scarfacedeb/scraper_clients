@@ -68,17 +68,10 @@ module Clients
       end
     end
 
-    def setup_request
-      request = HTTP.follow.headers(user_agent: user_agent)
-      request = request.cookies(cookies) if has_cookies?
-      request = request.via(proxy.http_host, proxy.http_port.to_i) if proxy?
-      request
-    end
-
     def make_request(verb, url, **options, &block)
       options = options.merge(ssl_context: ssl_context)
 
-      request = setup_request
+      request = setup_request options.delete(:follow_redirects)
       request = block.call(request) if block_given?
 
       log "#{verb.upcase} #{url}"
@@ -89,6 +82,17 @@ module Clients
       Response.new response
     rescue
       raise HTTPError.new(url: url, proxy: proxy)
+    end
+
+    def setup_request(follow_redirects)
+      follow_redirects = true if follow_redirects.nil?
+
+      request = HTTP.headers(user_agent: user_agent)
+      request = request.follow if follow_redirects
+      request = request.cookies(cookies) if has_cookies?
+      request = request.via(proxy.http_host, proxy.http_port.to_i) if proxy?
+
+      request
     end
 
     def store_cookies(response)
