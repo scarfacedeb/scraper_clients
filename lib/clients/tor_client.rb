@@ -38,11 +38,11 @@ module Clients
     end
 
     def host
-      @config.fetch(:host)
+      @config[:host]
     end
 
     def port
-      @config.fetch(:port)
+      @config[:port]
     end
 
     def user
