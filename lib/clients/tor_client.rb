@@ -16,16 +16,16 @@ module Clients
     attr_reader :config, :threshold, :pool_num
 
     def_delegators :@config,
-      :host, :port, :http_port, :http_host
+      :tor_host, :tor_port
 
     # rubocop:disable Metrics/MethodLength
     def initialize(options = {})
       options = {
-        host:            "localhost",
-        port:            (ENV["TOR_PORT"] || DEFAULT_PORT).to_i,
+        tor_host:        "localhost",
+        tor_port:        (ENV["TOR_PORT"] || DEFAULT_PORT).to_i,
         control_port:    (ENV["TOR_CONTROL_PORT"] || DEFAULT_CONTROL_PORT).to_i,
-        http_host:       "localhost",
-        http_port:       (ENV["HTTP_TOR_PORT"] || DEFAULT_HTTP_PORT).to_i,
+        host:            "localhost",
+        port:            (ENV["HTTP_TOR_PORT"] || DEFAULT_HTTP_PORT).to_i,
         circuit_timeout: 10,
         throttle_by:     10, # .seconds implied
         pool_num:        nil
@@ -37,15 +37,26 @@ module Clients
       setup_pool
     end
 
-    def proxy_address
-      "127.0.0.1:#{config.port}"
+    def host
+      @config.fetch(:host)
     end
 
-    # Switch routes
+    def port
+      @config.fetch(:port)
+    end
+
+    def user
+      nil
+    end
+
+    def password
+      nil
+    end
+
     def switch_identity
       throttle do
         client = Net::Telnet.new(
-          "Host"    => config.host,
+          "Host"    => config.tor_host,
           "Port"    => config.control_port,
           "Timeout" => config.circuit_timeout,
           "Prompt"  => Regexp.new(OK_STATUS)
@@ -81,7 +92,6 @@ module Clients
       end
     end
 
-
     def authenticate(client)
       client.cmd("AUTHENTICATE") do |c|
         fail "cannot authenticate to Tor!" unless c == OK_STATUS
@@ -94,13 +104,11 @@ module Clients
       end
     end
 
-    private
-
     def setup_pool
       return unless pool_num
 
-      config.port = config.port + 2*pool_num
-      config.control_port = config.control_port + 2*pool_num
+      config.tor_port += 2 * pool_num
+      config.control_port += 2 * pool_num
     end
 
     def check_threshold

@@ -16,10 +16,6 @@ module Clients
         allow(subject).to receive(:sleep).and_return(0)
       end
 
-      it "returns the correct proxy address" do
-        expect(subject.proxy_address).to eq("127.0.0.1:9050")
-      end
-
       it "throttles tor switch route command by 10 seconds", skip: true do
         time = Time.now
 

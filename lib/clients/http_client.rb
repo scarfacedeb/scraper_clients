@@ -42,7 +42,7 @@ module Clients
     def reset_proxy
       return unless proxy
 
-      log "Reset proxy to #{proxy.http_host}:#{proxy.http_port}"
+      log "Reset proxy to #{proxy.host}:#{proxy.port}"
       proxy.reset!
     end
 
@@ -90,7 +90,7 @@ module Clients
       request = HTTP.headers(user_agent: user_agent)
       request = request.follow if follow_redirects
       request = request.cookies(cookies) if has_cookies?
-      request = request.via(proxy.http_host, proxy.http_port.to_i) if proxy?
+      request = request.via(proxy.host, proxy.port, proxy.user, proxy.password) if proxy?
 
       request
     end
