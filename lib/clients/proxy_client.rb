@@ -1,29 +1,52 @@
+require "http"
+
 module Clients
   class ProxyClient
-    attr_reader :http_port, :http_host
+    API_URL = "https://proxy6.net/api".freeze
 
-    MAX_RESET_TRIES = 10
+    attr_reader :pool_num
 
-    def initialize(list_path, max_reset_tries: MAX_RESET_TRIES)
-      @list_path = list_path
-      @max_reset_tries = max_reset_tries
-
-      fail "Proxy list doesn't exists at #{list_path}" unless @list_path.exists?
-      reset!
+    def initialize(
+      pool_num:,
+      api_url: API_URL,
+      api_key: ENV["PROXY6_KEY"]
+    )
+      @pool_num = pool_num
+      @api_url = api_url
+      @api_key = api_key
+      @proxy = fetch_proxy
     end
 
-    def reset!(try: 0)
-      host, port = proxy_list.sample.strip.split ":"
-      if host && port
-        @http_host = host
-        @http_port = port
-      elsif try < MAX_RESET_TRIES
-        reset! try: try + 1
-      end
+    def host
+      @proxy["host"]
     end
 
-    def proxy_list
-      @proxy_list ||= File.readlines(@list_path)
+    def port
+      @proxy["port"].to_i
+    end
+
+    def user
+      @proxy["user"]
+    end
+
+    def password
+      @proxy["pass"]
+    end
+
+    def reset!
+      @proxy = fetch_proxy
+    end
+
+    private
+
+    def fetch_proxy
+      response = HTTP.accept(:json).get(api_url, params: { state: "active" })
+      proxies = JSON.parse(response.to_s).fetch("list")
+      proxies.values.rotate(@pool_num).first
+    end
+
+    def api_url
+      [@api_url, @api_key, "get_proxy/"].join("/")
     end
   end
 end
