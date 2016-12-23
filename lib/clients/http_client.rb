@@ -5,8 +5,8 @@ require "clients/http_client/errors"
 
 module Clients
   class HttpClient
-    attr_writer :user_agent
-    attr_accessor :cookies, :proxy
+    attr_writer :user_agent, :cookies
+    attr_accessor :proxy
 
     def initialize(proxy: nil, logger: nil)
       @proxy = proxy
@@ -47,7 +47,11 @@ module Clients
     end
 
     def reset_cookies
-      self.cookies = nil
+      @cookies = nil
+    end
+
+    def cookies
+      @cookies ||= HTTP::CookieJar.new
     end
 
     def user_agent
@@ -96,7 +100,10 @@ module Clients
     end
 
     def store_cookies(response)
-      self.cookies = response.cookies
+      return if response.cookies.empty?
+      response.cookies.each do |cookie|
+        self.cookies << cookie
+      end
     end
 
     def ssl_context
