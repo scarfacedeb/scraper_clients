@@ -75,6 +75,12 @@ Style/NumericPredicate:
 Style/SafeNavigation:
   Enabled: false
 
+Style/DoubleNegation:
+  Enabled: false
+
+Style/RaiseArgs:
+  Enabled: false
+
 Metrics/LineLength:
   Max: 120
 

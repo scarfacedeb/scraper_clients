@@ -2,21 +2,21 @@ require "spec_helper"
 
 module Clients
   RSpec.describe HttpClient do
-    let(:url) { "http://ya.ru/index.html" }
-
-    before do
-      stub_request(:get, url).and_return(
-        status: 202,
-        body: "RESPONSE",
-        headers: {
-          content_type: "image/png; charset=UTF-8"
-        }
-      )
-    end
+    subject { described_class.new }
 
     describe "#get" do
-      subject { described_class.new }
+      let(:url) { "http://ya.ru/index.html" }
       let(:response) { subject.get(url) }
+
+      before do
+        stub_request(:get, url).and_return(
+          status: 202,
+          body: "RESPONSE",
+          headers: {
+            content_type: "image/png; charset=UTF-8"
+          }
+        )
+      end
 
       it "makes a request to given url" do
         response
@@ -88,6 +88,113 @@ module Clients
         expect(response.to_s).to eq("RESPONSE")
         expect(response.code).to eq(202)
         expect(response.mime_type).to eq("image/png")
+      end
+    end
+
+    describe "#proxy?" do
+      context "when proxy has been used" do
+        let(:proxy) { instance_spy("Clients::TorProxy") }
+        subject { described_class.new proxy: proxy }
+
+        it "returns true" do
+          expect(subject.proxy?).to eq(true)
+        end
+      end
+
+      context "when proxy has NOT been used" do
+        it "returns false" do
+          expect(subject.proxy?).to eq(false)
+        end
+      end
+    end
+
+    describe "#has_cookies?" do
+      context "when client has cookies" do
+        let(:cookie) { HTTP::Cookie.new("group", "admin", domain: "example.com", path: "/") }
+
+        it "returns true" do
+          subject.cookies << cookie
+          expect(subject).to have_cookies
+        end
+      end
+
+      context "when proxy has NOT been used" do
+        it "returns false" do
+          expect(subject).not_to have_cookies
+        end
+      end
+    end
+
+    describe "#store_cookies" do
+      let(:cookies) { HTTP::CookieJar.new }
+      let(:old_cookie) { HTTP::Cookie.new("group", "admin", domain: "example.com", path: "/") }
+      let(:new_cookie) { HTTP::Cookie.new("uid", "u12345", domain: "ya.ru", path: "/admin") }
+      let(:response) { instance_spy("Http::Response", cookies: cookies) }
+
+      before do
+        subject.cookies << old_cookie
+        cookies << new_cookie
+      end
+
+      it "adds given cookies from the response" do
+        subject.store_cookies response
+        expect(subject.cookies.to_a).to contain_exactly(old_cookie, new_cookie)
+      end
+
+      it "sents new and old cookies with the new request" do
+        url = "https://placeholder.com"
+        stub_request(:get, url).and_return(status: 200)
+
+        subject.store_cookies response
+        subject.get(url)
+
+        expect(WebMock).to have_requested(:get, url)
+          .with(headers: { "Cookie" => "group=admin; uid=u12345" })
+          .once
+      end
+    end
+
+    describe "#reset_cookies" do
+      let(:cookie) { HTTP::Cookie.new("group", "admin", domain: "example.com", path: "/") }
+
+      it "reset client cookies" do
+        subject.cookies << cookie
+        subject.reset_cookies
+        expect(subject.cookies).to be_empty
+      end
+    end
+
+    describe "#reset_user_agent" do
+      it "reset client user agent" do
+        subject.user_agent
+        expect(subject.user_agent).not_to be_empty
+
+        # Need to stub sample, because it's not deterministic
+        allow(subject).to receive(:sample_user_agent).and_return("UA")
+
+        subject.reset_user_agent
+
+        expect(subject.user_agent).to eq("UA")
+      end
+    end
+
+    describe "#reset_proxy" do
+      context "when proxy has been used" do
+        let(:proxy) { instance_spy("Clients::TorProxy") }
+        subject { described_class.new proxy: proxy }
+
+        it "calls reset on proxy" do
+          subject.reset_proxy
+          expect(proxy).to have_received(:reset!).once
+        end
+      end
+
+      context "when proxy has NOT been used" do
+        subject { described_class.new }
+
+        it "does nothing" do
+          expect { subject.reset_proxy }.not_to raise_error
+        end
       end
     end
   end

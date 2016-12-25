@@ -8,24 +8,27 @@ module Clients
     attr_writer :user_agent, :cookies
     attr_accessor :proxy
 
-    def initialize(proxy: nil, logger: nil)
+    def initialize(
+      proxy: nil,
+      logger: nil
+    )
       @proxy = proxy
       @logger = logger
     end
 
     def proxy?
-      proxy
+      !!proxy
     end
 
     def has_cookies?
-      cookies && cookies.any?
+      cookies.any?
     end
 
     def get(url, **options, &block)
       make_request :get, url, **options, &block
     end
 
-    def post(url, **options)
+    def post(url, **options, &block)
       make_request :post, url, **options, &block
     end
 
@@ -44,6 +47,13 @@ module Clients
 
       log "Reset proxy to #{proxy.host}:#{proxy.port}"
       proxy.reset!
+    end
+
+    def store_cookies(response)
+      return if response.cookies.empty?
+      response.cookies.each do |cookie|
+        self.cookies << cookie
+      end
     end
 
     def reset_cookies
@@ -72,16 +82,14 @@ module Clients
       end
     end
 
-    def make_request(verb, url, **options, &block)
+    def make_request(verb, url, **options)
       options = options.merge(ssl_context: ssl_context)
 
       request = setup_request options.delete(:follow_redirects)
-      request = block.call(request) if block_given?
+      request = yield request if block_given?
 
       log "#{verb.upcase} #{url}"
       response = request.request(verb, url, **options)
-
-      store_cookies response
 
       Response.new response
     rescue
@@ -97,13 +105,6 @@ module Clients
       request = request.via(proxy.host, proxy.port, proxy.user, proxy.password) if proxy?
 
       request
-    end
-
-    def store_cookies(response)
-      return if response.cookies.empty?
-      response.cookies.each do |cookie|
-        self.cookies << cookie
-      end
     end
 
     def ssl_context
