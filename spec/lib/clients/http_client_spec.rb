@@ -126,10 +126,9 @@ module Clients
     end
 
     describe "#store_cookies" do
-      let(:cookies) { HTTP::CookieJar.new }
       let(:old_cookie) { HTTP::Cookie.new("group", "admin", domain: "example.com", path: "/") }
       let(:new_cookie) { HTTP::Cookie.new("uid", "u12345", domain: "ya.ru", path: "/admin") }
-      let(:response) { instance_spy("Http::Response", cookies: cookies) }
+      let(:cookies) { HTTP::CookieJar.new }
 
       before do
         subject.cookies << old_cookie
@@ -137,7 +136,7 @@ module Clients
       end
 
       it "adds given cookies from the response" do
-        subject.store_cookies response
+        subject.store_cookies cookies
         expect(subject.cookies.to_a).to contain_exactly(old_cookie, new_cookie)
       end
 
@@ -145,7 +144,7 @@ module Clients
         url = "https://placeholder.com"
         stub_request(:get, url).and_return(status: 200)
 
-        subject.store_cookies response
+        subject.store_cookies cookies
         subject.get(url)
 
         expect(WebMock).to have_requested(:get, url)

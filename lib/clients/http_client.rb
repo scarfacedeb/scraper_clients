@@ -49,9 +49,9 @@ module Clients
       proxy.reset!
     end
 
-    def store_cookies(response)
-      return if response.cookies.empty?
-      response.cookies.each do |cookie|
+    def store_cookies(cookies)
+      return if cookies.empty?
+      cookies.each do |cookie|
         self.cookies << cookie
       end
     end
