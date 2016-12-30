@@ -91,6 +91,27 @@ module Clients
       end
     end
 
+    describe "#head" do
+      let(:url) { "http://ya.ru/index.html" }
+      let(:response) { subject.head(url) }
+
+      before do
+        stub_request(:head, url).and_return(status: 202)
+      end
+
+      it "makes a request to given url" do
+        response
+        expect(WebMock).to have_requested(:head, url)
+      end
+
+      it "returns wrapped response" do
+        expect(response).to be_an_instance_of(HttpClient::Response)
+        expect(response.code).to eq(202)
+        expect(response.uri.to_s).to eq(url)
+      end
+    end
+
+
     describe "#proxy?" do
       context "when proxy has been used" do
         let(:proxy) { instance_spy("Clients::TorProxy") }

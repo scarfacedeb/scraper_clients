@@ -25,11 +25,29 @@ module Clients
     end
 
     def get(url, **options, &block)
-      make_request :get, url, **options, &block
+      request :get, url, **options, &block
     end
 
     def post(url, **options, &block)
-      make_request :post, url, **options, &block
+      request :post, url, **options, &block
+    end
+
+    def head(url, **options, &block)
+      request :head, url, **options, &block
+    end
+
+    def request(verb, url, **options)
+      options = options.merge(ssl_context: ssl_context)
+
+      request = setup_request options.delete(:follow_redirects)
+      request = yield request if block_given?
+
+      log "#{verb.upcase} #{url}"
+      response = request.request(verb, url, **options)
+
+      Response.new response
+    rescue
+      raise HTTPError.new(url: url, proxy: proxy)
     end
 
     def reset
@@ -80,20 +98,6 @@ module Clients
       def user_agents_path
         File.join File.dirname(__FILE__), "../../data/user_agents.txt"
       end
-    end
-
-    def make_request(verb, url, **options)
-      options = options.merge(ssl_context: ssl_context)
-
-      request = setup_request options.delete(:follow_redirects)
-      request = yield request if block_given?
-
-      log "#{verb.upcase} #{url}"
-      response = request.request(verb, url, **options)
-
-      Response.new response
-    rescue
-      raise HTTPError.new(url: url, proxy: proxy)
     end
 
     def setup_request(follow_redirects)
