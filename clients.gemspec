@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   s.files = Dir["{lib}/**/*", "README.md"]
   s.test_files = []
 
-  s.add_dependency "connection_pool", "~> 2.2"
   s.add_dependency "addressable", "~> 2.3"
   s.add_dependency "http", "~> 2.0"
   s.add_dependency "net-telnet", "~> 0.1"
