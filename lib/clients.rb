@@ -1,6 +1,7 @@
 require "connection_pool"
 require "clients/tor_client"
 require "clients/http_client"
+require "clients/proxy_client"
 
 module Clients
   class << self
