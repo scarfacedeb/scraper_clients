@@ -42,14 +42,20 @@ module Clients
 
     def fetch_proxy
       response = HTTP.accept(:json).get(api_url, params: { state: "active" })
-      fail ProxyClientError, "Invalid proxy list: #{response.status} #{response.to_s}" unless response.status.success?
+      json = JSON.parse(response.to_s) if response.status.success?
 
-      proxies = JSON.parse(response.to_s).fetch("list")
+      fail_on_fetch(response) if !response.status.success? || !json.key?("list")
+
+      proxies = json.fetch("list")
       proxies.values.rotate(@pool_num).first
     end
 
     def api_url
       [@api_url, @api_key, "get_proxy/"].join("/")
+    end
+
+    def fail_on_fetch(response)
+      fail ProxyClientError, "Invalid proxy list: #{response.status} #{response.to_s}"
     end
   end
 end
