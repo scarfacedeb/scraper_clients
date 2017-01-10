@@ -1,7 +1,7 @@
 require "http"
 require "openssl"
 require "clients/http_client/response"
-require "clients/http_client/errors"
+require "clients/errors"
 
 module Clients
   class HttpClient
@@ -47,7 +47,7 @@ module Clients
 
       Response.new response
     rescue
-      raise HTTPError.new(url: url, proxy: proxy)
+      raise HttpClientError.new(url: url, proxy: proxy)
     end
 
     def reset

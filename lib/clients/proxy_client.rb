@@ -1,4 +1,5 @@
 require "http"
+require "clients/errors"
 
 module Clients
   class ProxyClient
@@ -41,6 +42,8 @@ module Clients
 
     def fetch_proxy
       response = HTTP.accept(:json).get(api_url, params: { state: "active" })
+      fail ProxyClientError, "Invalid proxy list: #{response.status} #{response.to_s}" unless response.status.success?
+
       proxies = JSON.parse(response.to_s).fetch("list")
       proxies.values.rotate(@pool_num).first
     end
