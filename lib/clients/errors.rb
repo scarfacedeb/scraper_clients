@@ -12,4 +12,5 @@ module Clients
   end
 
   class ProxyClientError < ClientError; end
+  class RecaptchaError < ClientError; end
 end

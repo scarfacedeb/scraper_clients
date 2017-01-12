@@ -1,6 +1,7 @@
 require "clients/tor_client"
 require "clients/http_client"
 require "clients/proxy_client"
+require "clients/recaptcha/client"
 
 module Clients
   class << self
