@@ -42,8 +42,9 @@ module Clients
       request = setup_request options.delete(:follow_redirects)
       request = yield request if block_given?
 
-      log "#{verb.upcase} #{url}"
+      start = Time.now
       response = request.request(verb, url, **options)
+      log "#{verb.upcase} #{url} (#{Time.now - start}s)"
 
       Response.new response
     rescue
