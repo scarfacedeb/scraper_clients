@@ -51,7 +51,7 @@ module Clients
     end
 
     def api_url
-      [@api_url, @api_key, "get_proxy/"].join("/")
+      [@api_url, @api_key, "getproxy/"].join("/")
     end
 
     def fail_on_fetch(response)
