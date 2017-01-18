@@ -109,6 +109,7 @@ module Clients
 
       config.tor_port += 2 * pool_num
       config.control_port += 2 * pool_num
+      config.port += 2 * pool_num
     end
 
     def check_threshold
