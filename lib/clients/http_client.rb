@@ -42,9 +42,7 @@ module Clients
       request = setup_request options.delete(:follow_redirects)
       request = yield request if block_given?
 
-      response = log_request {
-        request.request(verb, url, **options)
-      }
+      response = make_request(request, verb, url, **options)
 
       Response.new response
     rescue
@@ -112,11 +110,11 @@ module Clients
       request
     end
 
-    def log_request
-      return yield unless @logger
-
+    def make_request(request, verb, url, **options)
       start = Time.now
-      response = yield
+
+      response = request.request(verb, url, **options)
+      return response unless @logger
 
       msg = "#{verb.upcase} #{url} (#{Time.now - start}s)"
       msg += " via #{proxy.host}:#{proxy.port}" if proxy?
