@@ -53,30 +53,57 @@ module Clients
           expect(subject.to_s).to eq("BODY")
         end
 
-        context "when response doesn't have valid charset" do
-          let(:body) { "Correct Ответ".force_encoding Encoding::CP1251 }
-
-          it "returns response body in UTF-8 encoding" do
-            response = subject.to_s
-
-            expect(response.encoding).to eq(Encoding::UTF_8)
-            expect(response).to eq("Correct Ответ")
+        context "when force_utf8 hasn't been provided" do
+          let(:body) { "\x89PNG\r\n\x1A\n\x00\x00\x00" }
+          it "sets force_utf8 to FALSE by default" do
+            expect(subject.to_s).to eq(body)
           end
         end
 
-        context "when response have valid charset - windows-1251" do
-          let(:headers) {
-            {
-              "Content-Type" => "text/html; charset=windows-1251"
+        context "when force_utf8 is FALSE" do
+          shared_examples "unmodified body" do
+            it "returns unmodified response body" do
+              expect(subject.to_s(force_utf8: false)).to eq(body)
+            end
+          end
+
+          context "when response doesn't have valid charset" do
+            let(:body) { "Correct Ответ".force_encoding Encoding::CP1251 }
+            include_examples "unmodified body"
+          end
+
+          context "when response is binary" do
+            let(:body) { "\x89PNG\r\n\x1A\n\x00\x00\x00" }
+            include_examples "unmodified body"
+          end
+        end
+
+        context "when force_utf8 is TRUE" do
+          context "when response doesn't have valid charset" do
+            let(:body) { "Correct Ответ".force_encoding Encoding::CP1251 }
+
+            it "returns response body in UTF-8 encoding" do
+              response = subject.to_s force_utf8: true
+
+              expect(response.encoding).to eq(Encoding::UTF_8)
+              expect(response).to eq("Correct Ответ")
+            end
+          end
+
+          context "when response have valid charset - windows-1251" do
+            let(:headers) {
+              {
+                "Content-Type" => "text/html; charset=windows-1251"
+              }
             }
-          }
-          let(:body) { "Correct Ответ".encode Encoding::CP1251 }
+            let(:body) { "Correct Ответ".encode Encoding::CP1251 }
 
-          it "returns response body in UTF-8 encoding" do
-            response = subject.to_s
+            it "returns response body in UTF-8 encoding" do
+              response = subject.to_s force_utf8: true
 
-            expect(response.encoding).to eq(Encoding::UTF_8)
-            expect(response).to eq("Correct Ответ")
+              expect(response.encoding).to eq(Encoding::UTF_8)
+              expect(response).to eq("Correct Ответ")
+            end
           end
         end
       end

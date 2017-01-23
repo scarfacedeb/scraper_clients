@@ -16,8 +16,9 @@ module Clients
         !success?
       end
 
-      def to_s
+      def to_s(force_utf8: false)
         response = object.to_s
+        return response unless force_utf8
 
         if object.charset
           response
