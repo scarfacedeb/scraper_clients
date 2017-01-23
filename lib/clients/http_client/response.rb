@@ -31,12 +31,12 @@ module Clients
         end
       end
 
-      def to_html
-        Nokogiri::HTML.parse to_s
+      def to_html(**kargs)
+        Nokogiri::HTML.parse to_s(**kargs)
       end
 
-      def to_json
-        JSON.parse to_s, symbolize_names: true
+      def to_json(**kargs)
+        JSON.parse to_s(**kargs), symbolize_names: true
       end
 
       def stream(size = HTTP::Connection::BUFFER_SIZE)

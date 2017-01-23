@@ -109,10 +109,37 @@ module Clients
       end
 
       describe "#to_html" do
-        let(:html) { subject.to_html }
         it "returns parsed response body" do
+          html = subject.to_html
           expect(html).to be_an_instance_of(Nokogiri::HTML::Document)
           expect(html.to_s).to include("<body><p>BODY</p></body>")
+        end
+
+        context "when force_utf8 is TRUE" do
+          let(:body) { "Correct Ответ".force_encoding Encoding::CP1251 }
+
+          it "returns parsed response body in valid UTF_8 encodin" do
+            html = subject.to_html(force_utf8: true)
+            expect(html).to be_an_instance_of(Nokogiri::HTML::Document)
+            expect(html.to_s).to include("<body><p>Correct Ответ</p></body>")
+          end
+        end
+      end
+
+      describe "#to_json" do
+        let(:body) { "[{\"brand\":\"Фирма ZANUSSI\",\"product_code\":\"91460370200\"}]" }
+        let(:parsed_body) { [{brand: "Фирма ZANUSSI", product_code: "91460370200"}] }
+
+        it "returns parsed json body" do
+          expect(subject.to_json).to eq parsed_body
+        end
+
+        context "when force_utf8 is TRUE" do
+          let(:body) { super().force_encoding Encoding::CP1251 }
+
+          it "returns parsed json body" do
+            expect(subject.to_json(force_utf8: true)).to eq parsed_body
+          end
         end
       end
 
@@ -131,18 +158,6 @@ module Clients
         context "buffer size is not specified" do
           it "streams response body" do
             expect { |b| subject.stream(&b) }.to yield_successive_args("BODY")
-          end
-        end
-      end
-
-      context "when response comes in plain text format" do
-        let(:body) { "[{\"brand\":\"ZANUSSI\",\"product_code\":\"91460370200\"}]" }
-        let(:parsed_body) { [{brand: "ZANUSSI", product_code: "91460370200"}] }
-
-        describe "#to_json" do
-          it "returns parsed json body" do
-            allow(subject).to receive(:to_s).and_return(body)
-            expect(subject.to_json).to eq parsed_body
           end
         end
       end
