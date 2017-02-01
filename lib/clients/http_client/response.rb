@@ -35,6 +35,10 @@ module Clients
         Nokogiri::HTML.parse to_s(**kargs)
       end
 
+      def to_xml(**kargs)
+        Nokogiri::XML.parse to_s(**kargs)
+      end
+
       def to_json(**kargs)
         JSON.parse to_s(**kargs), symbolize_names: true
       end

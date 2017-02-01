@@ -126,6 +126,26 @@ module Clients
         end
       end
 
+      describe "#to_xml" do
+        let(:body) { "<node><![CDATA[ Brazil ]]></node>" }
+
+        it "returns parsed response body" do
+          xml = subject.to_xml
+          expect(xml).to be_an_instance_of(Nokogiri::XML::Document)
+          expect(xml.to_s).to include("<node><![CDATA[ Brazil ]]></node>")
+        end
+
+        context "when force_utf8 is TRUE" do
+          let(:body) { "<node><![CDATA[ Бразилия ]]></node>".force_encoding Encoding::CP1251 }
+
+          it "returns parsed response body in valid UTF_8 encodin" do
+            xml = subject.to_xml(force_utf8: true)
+            expect(xml).to be_an_instance_of(Nokogiri::XML::Document)
+            expect(xml.to_s).to include("<node><![CDATA[ Бразилия ]]></node>")
+          end
+        end
+      end
+
       describe "#to_json" do
         let(:body) { "[{\"brand\":\"Фирма ZANUSSI\",\"product_code\":\"91460370200\"}]" }
         let(:parsed_body) { [{brand: "Фирма ZANUSSI", product_code: "91460370200"}] }
