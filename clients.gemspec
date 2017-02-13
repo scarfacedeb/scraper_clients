@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   s.summary     = "Clients to communicate with web and services"
   s.description = "Clients contains instruments to work with websites and local services. Adapted from manul."
 
-  s.files = Dir["{lib}/**/*", "README.md"]
-  s.test_files = []
+  s.files = Dir["{lib,data}/**/*", "README.md"]
+  s.test_files = Dir["spec/**/*", "bin/*"]
 
   s.add_dependency "addressable", "~> 2.3"
   s.add_dependency "http", "~> 2.0"
