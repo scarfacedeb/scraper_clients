@@ -16,8 +16,8 @@ module Clients
       @pool_num = pool_num
       @api_url = api_url
       @api_key = api_key
-      @proxy = fetch_proxy
       @ip_version = ip_version.to_s
+      @proxy = fetch_proxy
     end
 
     def host
