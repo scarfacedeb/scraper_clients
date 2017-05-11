@@ -1,3 +1,3 @@
 module Clients
-  VERSION = "6.3.1"
+  VERSION = "6.4.0"
 end
