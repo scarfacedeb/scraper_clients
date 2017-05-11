@@ -53,6 +53,10 @@ module Clients
       nil
     end
 
+    def to_s
+      "#{host}:#{port}"
+    end
+
     def switch_identity
       throttle do
         client = Net::Telnet.new(

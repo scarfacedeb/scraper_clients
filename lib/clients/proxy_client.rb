@@ -36,6 +36,10 @@ module Clients
       @proxy["pass"]
     end
 
+    def to_s
+      "#{host}:#{port}"
+    end
+
     def reset!
       @proxy = fetch_proxy
     end

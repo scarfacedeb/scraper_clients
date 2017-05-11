@@ -114,11 +114,14 @@ module Clients
       start = Time.now
 
       response = request.request(verb, url, **options)
-      return response unless @logger
 
-      msg = "#{verb.upcase} #{url} (#{Time.now - start}s)"
-      msg += " via #{proxy.host}:#{proxy.port}" if proxy?
-      log msg
+      log_request(
+        verb: verb.to_s.upcase,
+        url: url,
+        duration: (Time.now - start),
+        status: response.status.code,
+        mime_type: response.content_type.mime_type
+      )
 
       response
     end
@@ -133,9 +136,17 @@ module Clients
       self.class.user_agents.sample.strip
     end
 
-    def log(msg)
+    def log_request(req)
       return unless @logger
-      @logger.info msg
+
+      msg = "#{req[:verb]} #{req[:url]} (#{req[:duration]}s)"
+
+      log req.merge(message: msg, proxy: proxy&.to_s)
+    end
+
+    def log(msg_or_hash)
+      return unless @logger
+      @logger.info msg_or_hash
     end
   end
 end
