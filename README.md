@@ -17,7 +17,7 @@ It also implements a special wrapper around of HttpClient:
 Important ENV variables:
 
 - **PROXY6_KEY:** API key for proxy6.net service
-- **CAPTCHA_KEY:** API key for 2captcha.com service
+- **CAPTCHA_SOLVER_KEY:** API key for 2captcha.com service
 - **TOR_PORT:** Base port for tor SOCKS5 proxy
 - **TOR_CONTROL_PORT:** Base port for tor controls
 - **HTTP_TOR_PORT:** Base port for http middleman proxy for TorClient (e.g. polipo)

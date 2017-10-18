@@ -9,7 +9,7 @@ module Clients
 
       attr_reader :client, :captcha_key, :sleep_duration
 
-      def initialize(client, captcha_key: ENV["CAPTCHA_KEY"], sleep_duration: 5)
+      def initialize(client, captcha_key: ENV["CAPTCHA_SOLVER_KEY"], sleep_duration: 5)
         @client = client
         @captcha_key = captcha_key
         @sleep_duration = sleep_duration
