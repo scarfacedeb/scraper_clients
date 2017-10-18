@@ -5,15 +5,13 @@ module Clients
   class ProxyClient
     API_URL = "https://proxy6.net/api".freeze
 
-    attr_reader :pool_num, :ip_version
+    attr_reader :ip_version
 
     def initialize(
-      pool_num: 0,
       api_url: API_URL,
       api_key: ENV["PROXY6_KEY"],
       ip_version: "4"
     )
-      @pool_num = pool_num
       @api_url = api_url
       @api_key = api_key
       @ip_version = ip_version.to_s
@@ -58,9 +56,7 @@ module Clients
       proxies = proxies.values.select { |h| h["version"] == @ip_version }
       fail_on_invalid_list(response) if proxies.empty?
 
-      proxies
-        .rotate(@pool_num)
-        .first
+      proxies.sample
     end
 
     def api_url
