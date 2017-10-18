@@ -1,6 +1,5 @@
 *.gem
 .bundle
-.env
 .idea/
 vendor
 pkg
