@@ -1,5 +1,6 @@
 *.gem
 .bundle
+.idea/
 vendor
 pkg
 Gemfile.lock
