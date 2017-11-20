@@ -163,6 +163,17 @@ module Clients
         end
       end
 
+      describe "#to_io" do
+        let(:body) { "IO BODY" }
+
+        it "returns response as StringIO" do
+          io = subject.to_io
+          expect(io).to be_an_instance_of(StringIO)
+          expect(io.read).to eq("IO BODY")
+        end
+      end
+
+
       describe "#stream" do
         let(:url) { "http://example.com" }
         let(:response) { Clients::HttpClient.new.get(url) }

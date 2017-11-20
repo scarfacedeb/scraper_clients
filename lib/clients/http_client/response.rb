@@ -43,6 +43,10 @@ module Clients
         JSON.parse to_s(**kargs), symbolize_names: true
       end
 
+      def to_io
+        StringIO.new(to_s)
+      end
+
       def stream(size = HTTP::Connection::BUFFER_SIZE)
         while (chunk = object.body.readpartial(size))
           yield chunk
