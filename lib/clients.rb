@@ -14,5 +14,11 @@ module Clients
         end
       end
     end
+
+    # Helper to get default setup of HttpClient with ProxyClient
+    def setup_http_client(logger: nil)
+      proxy = Clients::ProxyClient.from_env
+      Clients::HttpClient.new(proxy: proxy, logger: logger)
+    end
   end
 end
