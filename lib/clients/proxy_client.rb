@@ -8,8 +8,6 @@ module Clients
       case ENV["CLIENTS_PROXY_CLIENT"]
       when "proxy6" then Proxy6Client.new
       when "list" then ProxyListClient.new
-      else
-        fail ProxyClientError, "missing CLIENTS_PROXY_CLIENT env variable"
       end
     end
   end
