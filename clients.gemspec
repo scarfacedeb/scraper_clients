@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.version     = Clients::VERSION
   s.authors     = ["Andrew Volozhanin"]
   s.email       = ["scarfacedeb@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/scarfacedeb/scraper_clients"
   s.summary     = "Clients to communicate with web and services"
   s.description = "Clients contains instruments to work with websites and local services."
 
