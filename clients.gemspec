@@ -5,13 +5,13 @@ require "clients/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "clients"
+  s.name        = "scraper_clients"
   s.version     = Clients::VERSION
   s.authors     = ["Andrew Volozhanin"]
   s.email       = ["scarfacedeb@gmail.com"]
   s.homepage    = ""
   s.summary     = "Clients to communicate with web and services"
-  s.description = "Clients contains instruments to work with websites and local services. Adapted from manul."
+  s.description = "Clients contains instruments to work with websites and local services."
 
   s.files = Dir["{lib,data}/**/*", "README.md"]
   s.test_files = Dir["spec/**/*", "bin/*"]
